@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ Chatbot Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#6366f1;
+  --primary-dark:#4f46e5;
+  --primary-soft:#eef2ff;
+  --border:#e2e8f0;
+  --text:#0f172a;
+  --muted:#64748b;
+  --success:#10b981;
+  --warning:#f59e0b;
+  --danger:#ef4444;
+}
+html,body{height:100%}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#f8fafc;
+  background-image:linear-gradient(180deg,#f8fafc 0%,#eef2ff 100%);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ========== AUTH SCREEN ========== */
+.auth-wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+}
+.auth-card{
+  width:100%;
+  max-width:520px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:22px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.1);
+  overflow:hidden;
+}
+.auth-header{
+  padding:44px 48px 28px;
+  text-align:center;
+}
+.auth-logo{
+  width:76px;
+  height:76px;
+  background:#6366f1;
+  background-image:linear-gradient(135deg,#6366f1,#8b5cf6);
+  border-radius:20px;
+  display:inline-grid;
+  place-items:center;
+  font-size:38px;
+  box-shadow:0 10px 24px rgba(99,102,241,0.4);
+  margin-bottom:20px;
+}
+.auth-header h1{
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-0.6px;
+}
+.auth-header p{
+  font-size:15px;
+  color:var(--muted);
+  margin-top:8px;
+}
+.tabs{
+  display:flex;
+  padding:0 48px;
+  border-bottom:1px solid var(--border);
+}
+.tab{
+  flex:1;
+  padding:16px 0;
+  text-align:center;
+  font-size:15px;
+  font-weight:600;
+  color:var(--muted);
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all 0.15s;
+  margin-bottom:-1px;
+}
+.tab.active{color:var(--primary-dark);border-bottom-color:var(--primary)}
+.tab:hover:not(.active){color:var(--text)}
+.auth-body{padding:36px 48px 40px}
+
+/* FORMS — stacked vertically, full width */
+#signin-form,
+#signup-form{
+  display:block;
+  width:100%;
+}
+
+/* FIELD — full-width block */
+.field{
+  display:block;
+  width:100%;
+  margin-bottom:22px;
+}
+.field label{
+  display:block;
+  width:100%;
+  font-size:14px;
+  font-weight:600;
+  color:var(--text);
+  margin-bottom:10px;
+}
+.field input{
+  display:block;
+  width:100%;
+  padding:18px 22px;
+  border:1.5px solid var(--border);
+  border-radius:14px;
+  font-size:16px;
+  font-family:inherit;
+  background:#f8fafc;
+  color:var(--text);
+  outline:none;
+  transition:all 0.18s;
+  line-height:1.4;
+}
+.field input::placeholder{color:#94a3b8;font-size:15px}
+.field input:hover{background:#f1f5f9;border-color:#cbd5e1}
+.field input:focus{
+  background:#fff;
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(99,102,241,0.15);
+}
+.field .error{
+  display:none;
+  font-size:13px;
+  color:var(--danger);
+  margin-top:8px;
+  font-weight:500;
+}
+.field.invalid input{border-color:var(--danger);background:#fef2f2}
+.field.invalid input:focus{box-shadow:0 0 0 4px rgba(239,68,68,0.12)}
+.field.invalid .error{display:block}
+
+.btn-primary{
+  display:block;
+  width:100%;
+  padding:18px 24px;
+  border:none;
+  border-radius:14px;
+  background:#6366f1;
+  background-image:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:#fff;
+  font-size:16px;
+  font-weight:700;
+  font-family:inherit;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(99,102,241,0.4);
+  transition:all 0.18s;
+  margin-top:8px;
+  letter-spacing:0.2px;
+}
+.btn-primary:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 10px 24px rgba(99,102,241,0.5);
+}
+.btn-primary:active:not(:disabled){transform:translateY(0)}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed}
+
+.divider{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin:26px 0;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:500;
+}
+.divider::before,
+.divider::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:var(--border);
+}
+
+.btn-google{
+  display:flex;
+  width:100%;
+  padding:16px 24px;
+  border:1.5px solid var(--border);
+  border-radius:14px;
+  background:#fff;
+  color:var(--text);
+  font-size:15.5px;
+  font-weight:600;
+  font-family:inherit;
+  cursor:pointer;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  transition:all 0.18s;
+}
+.btn-google:hover{
+  background:#f8fafc;
+  border-color:#94a3b8;
+  transform:translateY(-1px);
+}
+.btn-google svg{flex-shrink:0}
+
+.auth-footer{
+  text-align:center;
+  font-size:14px;
+  color:var(--muted);
+  margin-top:26px;
+}
+.auth-footer a{
+  color:var(--primary-dark);
+  font-weight:700;
+  text-decoration:none;
+  cursor:pointer;
+}
+.auth-footer a:hover{text-decoration:underline}
+
+/* ========== APP LAYOUT ========== */
+.app{display:none;flex-direction:column;min-height:100vh}
+.app.active{display:flex}
+
+header{
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+.hdr{
+  max-width:1200px;
+  margin:0 auto;
+  padding:14px 32px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{
+  width:44px;
+  height:44px;
+  background:#6366f1;
+  background-image:linear-gradient(135deg,#6366f1,#8b5cf6);
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  font-size:22px;
+  box-shadow:0 4px 12px rgba(99,102,241,0.35);
+}
+.brand h1{font-size:16px;font-weight:700}
+.brand p{font-size:12px;color:var(--muted);margin-top:2px}
+
+.user-area{position:relative}
+.user-btn{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:6px 12px 6px 6px;
+  background:#f1f5f9;
+  border:1px solid transparent;
+  border-radius:100px;
+  cursor:pointer;
+  font-family:inherit;
+  transition:all 0.15s;
+}
+.user-btn:hover{background:#e2e8f0;border-color:#cbd5e1}
+.avatar{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:#6366f1;
+  background-image:linear-gradient(135deg,#6366f1,#8b5cf6);
+  display:grid;
+  place-items:center;
+  color:#fff;
+  font-weight:700;
+  font-size:14px;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.user-info{display:flex;flex-direction:column;text-align:left;line-height:1.2}
+.user-name{font-size:13px;font-weight:600}
+.user-email{font-size:11px;color:var(--muted)}
+
+.menu{
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  width:260px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  box-shadow:0 12px 32px rgba(0,0,0,0.12);
+  padding:8px;
+  display:none;
+  z-index:200;
+  animation:fadeDown 0.15s ease;
+}
+@keyframes fadeDown{
+  from{opacity:0;transform:translateY(-6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.menu.open{display:block}
+.menu-header{
+  padding:12px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:6px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.menu-header .avatar{width:44px;height:44px;font-size:16px}
+.menu-header-text{overflow:hidden}
+.menu-header-text strong{
+  display:block;
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.menu-header-text span{
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  display:block;
+}
+.menu-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:8px;
+  font-size:13.5px;
+  color:var(--text);
+  cursor:pointer;
+  transition:background 0.15s;
+}
+.menu-item:hover{background:#f1f5f9}
+.menu-item.danger{color:var(--danger)}
+.menu-item.danger:hover{background:#fef2f2}
+
+.container{
+  flex:1;
+  width:100%;
+  max-width:1200px;
+  margin:0 auto;
+  padding:24px 32px;
+  display:grid;
+  grid-template-columns:280px 1fr;
+  gap:20px;
+  align-items:start;
+  min-height:0;
+}
+aside{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.06);
+  position:sticky;
+  top:80px;
+}
+aside h2{
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+  color:var(--muted);
+  margin-bottom:12px;
+}
+.chip{
+  display:block;
+  width:100%;
+  text-align:left;
+  padding:10px 12px;
+  margin-bottom:6px;
+  background:#f8fafc;
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-size:13px;
+  font-family:inherit;
+  font-weight:500;
+  color:var(--text);
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.chip:hover{
+  background:var(--primary-soft);
+  border-color:var(--primary);
+  color:var(--primary-dark);
+  transform:translateX(3px);
+}
+.stats{
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.stat{display:flex;justify-content:space-between;font-size:12px}
+.stat-l{color:var(--muted)}
+.stat-v{font-weight:600;color:var(--primary)}
+
+.chat{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.08);
+  display:flex;
+  flex-direction:column;
+  height:calc(100vh - 160px);
+  min-height:500px;
+  overflow:hidden;
+}
+.msgs{
+  flex:1;
+  overflow-y:auto;
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  scroll-behavior:smooth;
+}
+.msgs::-webkit-scrollbar{width:8px}
+.msgs::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+.msg{display:flex;gap:10px;max-width:85%;animation:fade 0.3s ease}
+@keyframes fade{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg .avatar{width:34px;height:34px;font-size:14px}
+.bubble{
+  background:#f1f5f9;
+  padding:12px 16px;
+  border-radius:14px;
+  border-top-left-radius:4px;
+  font-size:14px;
+  line-height:1.55;
+  word-wrap:break-word;
+}
+.msg.user .bubble{
+  background:#6366f1;
+  background-image:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:#fff;
+  border-radius:14px;
+  border-top-right-radius:4px;
+}
+.badge{
+  display:inline-block;
+  font-size:11px;
+  font-weight:600;
+  padding:3px 9px;
+  border-radius:100px;
+  margin-top:8px;
+}
+.badge.high{background:#d1fae5;color:#065f46}
+.badge.med{background:#fef3c7;color:#92400e}
+.badge.low{background:#fee2e2;color:#991b1b}
+.alts{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)}
+.alts-t{
+  font-size:11px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.alt{
+  padding:7px 9px;
+  border-radius:8px;
+  font-size:12.5px;
+  cursor:pointer;
+  color:var(--primary-dark);
+  border:1px solid transparent;
+  transition:background 0.15s;
+}
+.alt:hover{background:var(--primary-soft);border-color:#c7d2fe}
+.typing{display:flex;gap:4px}
+.typing span{
+  width:6px;
+  height:6px;
+  background:#94a3b8;
+  border-radius:50%;
+  animation:bounce 1.2s infinite;
+}
+.typing span:nth-child(2){animation-delay:0.15s}
+.typing span:nth-child(3){animation-delay:0.3s}
+@keyframes bounce{
+  0%,60%,100%{transform:translateY(0);opacity:0.4}
+  30%{transform:translateY(-5px);opacity:1}
+}
+form#chat-form{
+  display:flex;
+  gap:10px;
+  padding:14px 18px;
+  border-top:1px solid var(--border);
+  background:#f8fafc;
+}
+form#chat-form input{
+  flex:1;
+  padding:13px 16px;
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  font-size:14px;
+  font-family:inherit;
+  background:#fff;
+  outline:none;
+  transition:all 0.15s;
+}
+form#chat-form input:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(99,102,241,0.12);
+}
+button.send{
+  width:48px;
+  height:48px;
+  border:none;
+  border-radius:12px;
+  background:#6366f1;
+  background-image:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:#fff;
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  box-shadow:0 4px 12px rgba(99,102,241,0.35);
+  transition:all 0.15s;
+}
+button.send:hover:not(:disabled){
+  transform:translateY(-1px);
+  box-shadow:0 6px 16px rgba(99,102,241,0.45);
+}
+button.send:disabled{opacity:0.5;cursor:not-allowed}
+
+.toast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(100px);
+  background:#0f172a;
+  color:#fff;
+  padding:12px 20px;
+  border-radius:12px;
+  font-size:13.5px;
+  font-weight:500;
+  box-shadow:0 12px 32px rgba(0,0,0,0.2);
+  opacity:0;
+  transition:all 0.3s ease;
+  z-index:1000;
+  max-width:90vw;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{background:#059669}
+.toast.error{background:#dc2626}
+
+@media(max-width:640px){
+  .auth-card{max-width:100%;border-radius:18px}
+  .auth-header{padding:32px 24px 20px}
+  .auth-body{padding:24px 24px 28px}
+  .tabs{padding:0 24px}
+  .auth-logo{width:64px;height:64px;font-size:32px}
+  .auth-header h1{font-size:22px}
+  .field input{padding:16px 18px;font-size:15px}
+  .btn-primary{padding:16px 20px;font-size:15px}
+  .btn-google{padding:14px 20px;font-size:14.5px}
+}
+@media(max-width:900px){
+  .container{grid-template-columns:1fr;padding:16px;gap:16px}
+  aside{position:static;order:2}
+  .chat{height:calc(100vh - 200px)}
+  .hdr{padding:12px 16px}
+  .user-info{display:none}
+  .user-btn{padding:4px}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= AUTH SCREEN ================= -->
+<div class="auth-wrap" id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">🤖</div>
+      <h1>FAQ Chatbot Pro</h1>
+      <p>Sign in to chat with your AI assistant</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="signin">Sign In</div>
+      <div class="tab" data-tab="signup">Sign Up</div>
+    </div>
+
+    <div class="auth-body">
+      <!-- SIGN IN -->
+      <form id="signin-form">
+        <div class="field">
+          <label for="si-email">Email</label>
+          <input type="email" id="si-email" placeholder="you@example.com" autocomplete="email">
+          <div class="error">Please enter a valid email</div>
+        </div>
+        <div class="field">
+          <label for="si-pass">Password</label>
+          <input type="password" id="si-pass" placeholder="••••••••" autocomplete="current-password">
+          <div class="error">Password is required</div>
+        </div>
+        <button type="submit" class="btn-primary">Sign In</button>
+      </form>
+
+      <!-- SIGN UP -->
+      <form id="signup-form" style="display:none">
+        <div class="field">
+          <label for="su-name">Full Name</label>
+          <input type="text" id="su-name" placeholder="Jane Doe" autocomplete="name">
+          <div class="error">Name must be at least 2 characters</div>
+        </div>
+        <div class="field">
+          <label for="su-email">Email</label>
+          <input type="email" id="su-email" placeholder="you@example.com" autocomplete="email">
+          <div class="error">Please enter a valid email</div>
+        </div>
+        <div class="field">
+          <label for="su-pass">Password</label>
+          <input type="password" id="su-pass" placeholder="Min. 6 characters" autocomplete="new-password">
+          <div class="error">Password must be at least 6 characters</div>
+        </div>
+        <div class="field">
+          <label for="su-pass2">Confirm Password</label>
+          <input type="password" id="su-pass2" placeholder="Repeat password" autocomplete="new-password">
+          <div class="error">Passwords do not match</div>
+        </div>
+        <button type="submit" class="btn-primary">Create Account</button>
+      </form>
+
+      <div class="divider">or continue with</div>
+
+      <button type="button" class="btn-google" id="google-btn">
+        <svg width="20" height="20" viewBox="0 0 48 48">
+          <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+          <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+          <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+          <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-0.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-footer">
+        <span id="toggle-text">Don't have an account? <a id="toggle-link">Sign up</a></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MAIN APP ================= -->
+<div class="app" id="app">
+  <header>
+    <div class="hdr">
+      <div class="brand">
+        <div class="logo">🤖</div>
+        <div>
+          <h1>FAQ Chatbot Pro</h1>
+          <p>AI-powered FAQ matching</p>
+        </div>
+      </div>
+
+      <div class="user-area">
+        <button class="user-btn" id="user-btn">
+          <div class="avatar" id="header-avatar">?</div>
+          <div class="user-info">
+            <span class="user-name" id="header-name">User</span>
+            <span class="user-email" id="header-email">user@example.com</span>
+          </div>
+        </button>
+
+        <div class="menu" id="user-menu">
+          <div class="menu-header">
+            <div class="avatar" id="menu-avatar">?</div>
+            <div class="menu-header-text">
+              <strong id="menu-name">User</strong>
+              <span id="menu-email">user@example.com</span>
+            </div>
+          </div>
+          <div class="menu-item" id="menu-profile">👤 My Profile</div>
+          <div class="menu-item" id="menu-clear">🗑️ Clear Chat History</div>
+          <div class="menu-item danger" id="menu-signout">🚪 Sign Out</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside>
+      <h2>📋 Quick Topics</h2>
+      <button class="chip" data-q="How do I reset my password?">🔐 Password reset</button>
+      <button class="chip" data-q="Do you offer refunds?">💸 Refunds</button>
+      <button class="chip" data-q="What are your customer support hours?">🕐 Support hours</button>
+      <button class="chip" data-q="How can I contact support?">📞 Contact us</button>
+      <button class="chip" data-q="What payment methods do you accept?">💳 Payment methods</button>
+      <button class="chip" data-q="How is my data protected?">🛡️ Data security</button>
+      <button class="chip" data-q="Is there a mobile app?">📱 Mobile app</button>
+      <button class="chip" data-q="What is machine learning?">🧠 Machine learning</button>
+
+      <div class="stats">
+        <div class="stat"><span class="stat-l">Your queries</span><span class="stat-v" id="s-queries">0</span></div>
+        <div class="stat"><span class="stat-l">Cache hits</span><span class="stat-v" id="s-hits">0</span></div>
+        <div class="stat"><span class="stat-l">FAQs loaded</span><span class="stat-v" id="s-faqs">0</span></div>
+      </div>
+    </aside>
+
+    <section class="chat">
+      <div class="msgs" id="messages"></div>
+      <form id="chat-form">
+        <input id="q" type="text" placeholder="Ask a question..." autocomplete="off" autofocus>
+        <button class="send" type="submit" id="send">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </form>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   1. FAQ DATA
+   ========================================================= */
+const FAQS = [
+  {id:"faq_001",category:"Product",question:"What is Python?",
+   answer:"Python is a high-level, interpreted programming language known for readability, versatility, and a rich ecosystem."},
+  {id:"faq_002",category:"Product",question:"How do I install Python packages?",
+   answer:"Use pip: pip install package_name. Example: pip install numpy. For isolated environments, consider venv or conda."},
+  {id:"faq_003",category:"AI/ML",question:"What is machine learning?",
+   answer:"Machine learning is a branch of AI where models learn patterns from data instead of being explicitly programmed."},
+  {id:"faq_004",category:"Account",question:"How do I reset my password?",
+   answer:"Click 'Forgot Password' on the login screen, enter your registered email, and follow the reset link."},
+  {id:"faq_005",category:"Support",question:"What are your customer support hours?",
+   answer:"Support is available Monday-Friday, 9 AM to 6 PM IST. Priority customers have 24/7 access."},
+  {id:"faq_006",category:"Billing",question:"Do you offer refunds?",
+   answer:"Yes. Full refunds are available within 30 days of purchase. Contact billing@example.com to initiate."},
+  {id:"faq_007",category:"Support",question:"How can I contact support?",
+   answer:"Email support@example.com, call +91-1234567890, or open a ticket from your dashboard."},
+  {id:"faq_008",category:"AI/ML",question:"What is NLP?",
+   answer:"Natural Language Processing (NLP) enables computers to understand, interpret, and generate human language."},
+  {id:"faq_009",category:"Account",question:"How do I update my account information?",
+   answer:"Go to Settings, then Profile, edit your details, and click Save. Changes take effect immediately."},
+  {id:"faq_010",category:"Product",question:"Is there a mobile app?",
+   answer:"Yes, our mobile app is available on the iOS App Store and Google Play Store."},
+  {id:"faq_011",category:"Billing",question:"What payment methods do you accept?",
+   answer:"We accept Visa, MasterCard, American Express, UPI, PayPal, and net banking."},
+  {id:"faq_012",category:"Security",question:"How is my data protected?",
+   answer:"We use AES-256 encryption at rest, TLS 1.3 in transit, and comply with GDPR and SOC 2 Type II."}
+];
+
+/* =========================================================
+   2. NLP ENGINE
+   ========================================================= */
+const STOPWORDS = new Set([
+  "a","an","and","are","as","at","be","by","for","from","has","he","in",
+  "is","it","its","of","on","that","the","to","was","were","will","with",
+  "i","you","we","they","do","does","did","how","what","when","where",
+  "who","why","can","could","would","should","my","your","our","their",
+  "me","him","her","them","this","these","those","there","here","if",
+  "or","but","not","no","yes","so","than","then","too","very","just"
+]);
+
+function stem(word){
+  if(word.length < 4) return word;
+  const rules = [
+    [/ies$/,"y"],[/ied$/,"y"],[/ing$/,""],[/ed$/,""],[/es$/,""],
+    [/s$/,""],[/ly$/,""],[/ment$/,""],[/ness$/,""]
+  ];
+  for(const [pat,rep] of rules){
+    if(pat.test(word)){
+      const out = word.replace(pat,rep);
+      if(out.length >= 3) return out;
+    }
+  }
+  return word;
+}
+
+function preprocess(text){
+  if(!text) return [];
+  return text.toLowerCase()
+    .replace(/[^a-z0-9\s]/g," ")
+    .split(/\s+/)
+    .filter(t => t.length > 1 && !STOPWORDS.has(t))
+    .map(stem)
+    .filter(t => t.length > 1);
+}
+
+class TfidfIndex{
+  constructor(docs){
+    this.docs = docs.map(preprocess);
+    this.vocab = new Map();
+    this.idf = new Map();
+    this._build();
+  }
+  _build(){
+    const df = new Map();
+    const N = this.docs.length;
+    this.docs.forEach(tokens => {
+      const seen = new Set();
+      tokens.forEach(t => {
+        if(!seen.has(t)){seen.add(t);df.set(t,(df.get(t)||0)+1);}
+        if(!this.vocab.has(t)) this.vocab.set(t,this.vocab.size);
+      });
+    });
+    df.forEach((d,t) => this.idf.set(t, Math.log(1 + N/(1+d))));
+    this.vectors = this.docs.map(tokens => this._vec(tokens));
+  }
+  _vec(tokens){
+    const tf = new Map();
+    tokens.forEach(t => tf.set(t,(tf.get(t)||0)+1));
+    const maxTf = Math.max(...tf.values(),1);
+    const v = new Map();
+    tf.forEach((c,t) => {
+      const idf = this.idf.get(t);
+      if(idf !== undefined) v.set(t, (c/maxTf)*idf);
+    });
+    return v;
+  }
+  _cosine(a,b){
+    let dot=0,nA=0,nB=0;
+    a.forEach((v,k) => {nA+=v*v; if(b.has(k))dot+=v*b.get(k);});
+    b.forEach(v => nB+=v*v);
+    if(!nA||!nB) return 0;
+    return dot/(Math.sqrt(nA)*Math.sqrt(nB));
+  }
+  scoreAll(query){
+    const qv = this._vec(preprocess(query));
+    return this.vectors.map(v => this._cosine(qv,v));
+  }
+}
+
+function levenshtein(a,b){
+  if(!a.length) return b.length;
+  if(!b.length) return a.length;
+  const m = Array.from({length:b.length+1},() => new Array(a.length+1));
+  for(let i=0;i<=a.length;i++) m[0][i]=i;
+  for(let j=0;j<=b.length;j++) m[j][0]=j;
+  for(let j=1;j<=b.length;j++){
+    for(let i=1;i<=a.length;i++){
+      const cost = a[i-1]===b[j-1]?0:1;
+      m[j][i] = Math.min(m[j][i-1]+1, m[j-1][i]+1, m[j-1][i-1]+cost);
+    }
+  }
+  return m[b.length][a.length];
+}
+
+function fuzzyScore(a,b){
+  if(!a||!b) return 0;
+  const max = Math.max(a.length,b.length);
+  return max ? 1 - levenshtein(a,b)/max : 0;
+}
+
+class LRUCache{
+  constructor(max=100){
+    this.max=max;this.map=new Map();this.hits=0;this.misses=0;
+  }
+  get(k){
+    if(this.map.has(k)){
+      const v=this.map.get(k);
+      this.map.delete(k);
+      this.map.set(k,v);
+      this.hits++;
+      return v;
+    }
+    this.misses++;
+    return null;
+  }
+  set(k,v){
+    if(this.map.has(k)) this.map.delete(k);
+    this.map.set(k,v);
+    if(this.map.size>this.max){
+      const o=this.map.keys().next().value;
+      this.map.delete(o);
+    }
+  }
+  get hitRate(){const t=this.hits+this.misses;return t?this.hits/t:0;}
+}
+
+const SYNONYMS = {
+  "refund":"refund","money":"refund","return":"refund","cancel":"refund",
+  "password":"password","pwd":"password","login":"password","signin":"password",
+  "forgot":"password","reset":"password",
+  "contact":"contact","reach":"contact","call":"contact","email":"contact","phone":"contact",
+  "hours":"hours","timing":"hours","available":"hours",
+  "payment":"payment","card":"payment","credit":"payment","upi":"payment","paypal":"payment",
+  "security":"data","secure":"data","protection":"data","privacy":"data","encryption":"data","gdpr":"data",
+  "app":"mobile","android":"mobile","ios":"mobile",
+  "ml":"machine learning","ai":"machine learning","artificial":"machine learning"
+};
+
+class FAQChatbot{
+  constructor(faqs, threshold=0.15){
+    this.faqs = faqs;
+    this.threshold = threshold;
+    this.index = new TfidfIndex(faqs.map(f => f.question));
+    this.cache = new LRUCache(100);
+  }
+  ask(query){
+    query = (query||"").trim();
+    if(!query) return {answer:"Please type a question.",matched:false,confidence:0,category:null,alternatives:[]};
+
+    const cached = this.cache.get(query.toLowerCase());
+    if(cached) return {...cached, cached:true};
+
+    const lowerQ = query.toLowerCase();
+    let expanded = query;
+    for(const [k,v] of Object.entries(SYNONYMS)){
+      if(lowerQ.includes(k)) expanded += " " + v;
+    }
+
+    let scores = this.index.scoreAll(expanded);
+
+    const qTokens = preprocess(query);
+    const fuzzyScores = this.faqs.map(f => {
+      const fTokens = preprocess(f.question);
+      if(!fTokens.length || !qTokens.length) return 0;
+      const qSet = new Set(qTokens);
+      const fSet = new Set(fTokens);
+      const inter = [...qSet].filter(t => fSet.has(t)).length;
+      const union = new Set([...qSet,...fSet]).size;
+      const jaccard = union ? inter/union : 0;
+      let bestPair = 0;
+      for(const qt of qTokens){
+        for(const ft of fTokens){
+          const s = fuzzyScore(qt,ft);
+          if(s > bestPair) bestPair = s;
+        }
+      }
+      const raw = fuzzyScore(lowerQ, f.question.toLowerCase());
+      return 0.4*jaccard + 0.4*bestPair + 0.2*raw;
+    });
+    scores = scores.map((s,i) => 0.55*s + 0.45*fuzzyScores[i]);
+
+    let bestIdx = 0, bestScore = -1;
+    scores.forEach((s,i) => {if(s>bestScore){bestScore=s;bestIdx=i;}});
+    const faq = this.faqs[bestIdx];
+    const matched = bestScore >= this.threshold;
+
+    let answer;
+    if(matched) answer = faq.answer;
+    else if(bestScore >= 0.05) answer = "I'm not fully sure, but here's the closest match:\n\n" + faq.answer;
+    else answer = "Sorry, I couldn't find a matching answer. Please rephrase or contact support@example.com.";
+
+    const sorted = scores.map((s,i)=>({score:s,idx:i}))
+      .sort((a,b)=>b.score-a.score).slice(1,4).filter(x=>x.score>0.1);
+
+    const alternatives = sorted.map(x => ({
+      question: this.faqs[x.idx].question,
+      answer: this.faqs[x.idx].answer,
+      confidence: Number(x.score.toFixed(3))
+    }));
+
+    const result = {
+      answer, matched,
+      confidence: Number(bestScore.toFixed(4)),
+      faqId: faq.id, category: faq.category, alternatives
+    };
+    this.cache.set(query.toLowerCase(), result);
+    return result;
+  }
+  stats(){
+    return {
+      faqsLoaded:this.faqs.length,
+      cacheHits:this.cache.hits,
+      cacheMisses:this.cache.misses,
+      hitRate:this.cache.hitRate,
+      threshold:this.threshold
+    };
+  }
+}
+
+const bot = new FAQChatbot(FAQS);
+
+/* =========================================================
+   3. AUTH SYSTEM
+   ========================================================= */
+const Auth = {
+  usersKey: "faq_users",
+  sessionKey: "faq_session",
+  analyticsKey: "faq_analytics",
+
+  loadUsers(){
+    try{return JSON.parse(localStorage.getItem(this.usersKey) || "{}");}
+    catch(e){return {};}
+  },
+  saveUsers(u){ localStorage.setItem(this.usersKey, JSON.stringify(u)); },
+
+  async hashPassword(pwd){
+    const buf = new TextEncoder().encode(pwd + "faq_salt_v1");
+    const hash = await crypto.subtle.digest("SHA-256", buf);
+    return Array.from(new Uint8Array(hash))
+      .map(b => b.toString(16).padStart(2,"0")).join("");
+  },
+
+  async signup(name, email, password){
+    email = email.toLowerCase().trim();
+    const users = this.loadUsers();
+    if(users[email]) throw new Error("An account with this email already exists");
+    const hash = await this.hashPassword(password);
+    users[email] = {
+      name: name.trim(),
+      email,
+      hash,
+      createdAt: new Date().toISOString(),
+      provider: "email",
+      avatar: null
+    };
+    this.saveUsers(users);
+    return this._createSession(users[email]);
+  },
+
+  async signin(email, password){
+    email = email.toLowerCase().trim();
+    const users = this.loadUsers();
+    const user = users[email];
+    if(!user) throw new Error("No account found with this email");
+    if(user.provider === "google")
+      throw new Error("This account uses Google sign-in. Please use 'Continue with Google'.");
+    const hash = await this.hashPassword(password);
+    if(hash !== user.hash) throw new Error("Incorrect password");
+    return this._createSession(user);
+  },
+
+  signInWithGoogle(profile){
+    const users = this.loadUsers();
+    const email = profile.email.toLowerCase();
+    users[email] = {
+      ...(users[email] || {}),
+      name: profile.name,
+      email,
+      avatar: profile.picture || null,
+      provider: "google",
+      createdAt: (users[email] && users[email].createdAt) || new Date().toISOString()
+    };
+    this.saveUsers(users);
+    return this._createSession(users[email]);
+  },
+
+  _createSession(user){
+    const session = {
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar || null,
+      provider: user.provider,
+      loginAt: new Date().toISOString()
+    };
+    localStorage.setItem(this.sessionKey, JSON.stringify(session));
+    return session;
+  },
+
+  getSession(){
+    try{return JSON.parse(localStorage.getItem(this.sessionKey) || "null");}
+    catch(e){return null;}
+  },
+
+  signout(){ localStorage.removeItem(this.sessionKey); },
+
+  logQuery(email, entry){
+    const all = this._loadAnalytics();
+    if(!all[email]) all[email] = [];
+    all[email].push({timestamp:new Date().toISOString(), ...entry});
+    if(all[email].length > 500) all[email].splice(0, all[email].length - 500);
+    localStorage.setItem(this.analyticsKey, JSON.stringify(all));
+  },
+  getUserStats(email){
+    const all = this._loadAnalytics();
+    const rows = all[email] || [];
+    return {count: rows.length};
+  },
+  _loadAnalytics(){
+    try{return JSON.parse(localStorage.getItem(this.analyticsKey) || "{}");}
+    catch(e){return {};}
+  },
+  clearUserChat(email){
+    const all = this._loadAnalytics();
+    delete all[email];
+    localStorage.setItem(this.analyticsKey, JSON.stringify(all));
+  }
+};
+
+/* =========================================================
+   4. UI HELPERS
+   ========================================================= */
+const $ = id => document.getElementById(id);
+
+function toast(msg, type="info"){
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = "toast " + type;
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+function initial(name){
+  return (name || "?").trim().charAt(0).toUpperCase();
+}
+
+function avatarHTML(user){
+  if(user.avatar){
+    return '<img src="' + user.avatar + '" alt="' + user.name + '" referrerpolicy="no-referrer">';
+  }
+  return initial(user.name);
+}
+
+function setAvatar(el, user){
+  el.innerHTML = avatarHTML(user);
+}
+
+/* =========================================================
+   5. AUTH UI WIRING
+   ========================================================= */
+const authScreen = $("auth-screen");
+const appEl = $("app");
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    const isSignin = tab.dataset.tab === "signin";
+    $("signin-form").style.display = isSignin ? "block" : "none";
+    $("signup-form").style.display = isSignin ? "none" : "block";
+    $("toggle-text").innerHTML = isSignin
+      ? 'Don\'t have an account? <a id="toggle-link">Sign up</a>'
+      : 'Already have an account? <a id="toggle-link">Sign in</a>';
+    bindToggle();
+  });
+});
+
+function bindToggle(){
+  const link = $("toggle-link");
+  if(link){
+    link.addEventListener("click", () => {
+      const next = document.querySelector(".tab.active").dataset.tab === "signin"
+        ? "signup" : "signin";
+      document.querySelector('.tab[data-tab="' + next + '"]').click();
+    });
+  }
+}
+bindToggle();
+
+function setError(inputEl, on){
+  const field = inputEl.closest(".field");
+  if(field) field.classList.toggle("invalid", on);
+}
+
+const isEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+/* Sign up */
+$("signup-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const name = $("su-name");
+  const email = $("su-email");
+  const pass = $("su-pass");
+  const pass2 = $("su-pass2");
+
+  let valid = true;
+  setError(name, name.value.trim().length < 2);
+  if(name.value.trim().length < 2) valid = false;
+  setError(email, !isEmail(email.value));
+  if(!isEmail(email.value)) valid = false;
+  setError(pass, pass.value.length < 6);
+  if(pass.value.length < 6) valid = false;
+  setError(pass2, pass.value !== pass2.value);
+  if(pass.value !== pass2.value) valid = false;
+  if(!valid) return;
+
+  try{
+    const session = await Auth.signup(name.value, email.value, pass.value);
+    toast("Account created! Welcome, " + session.name.split(" ")[0], "success");
+    setTimeout(() => enterApp(session), 400);
+  }catch(err){
+    toast(err.message, "error");
+  }
+});
+
+/* Sign in */
+$("signin-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = $("si-email");
+  const pass = $("si-pass");
+
+  let valid = true;
+  setError(email, !isEmail(email.value));
+  if(!isEmail(email.value)) valid = false;
+  setError(pass, pass.value.length < 1);
+  if(!pass.value) valid = false;
+  if(!valid) return;
+
+  try{
+    const session = await Auth.signin(email.value, pass.value);
+    toast("Welcome back, " + session.name.split(" ")[0] + "!", "success");
+    setTimeout(() => enterApp(session), 400);
+  }catch(err){
+    toast(err.message, "error");
+  }
+});
+
+/* Google */
+$("google-btn").addEventListener("click", async () => {
+  if(window.google && window.GOOGLE_CLIENT_ID && window.GOOGLE_CLIENT_ID !== "DEMO"){
+    google.accounts.id.prompt();
+    return;
+  }
+
+  const name = prompt("Demo Google Sign-In\n\nEnter your name:", "Alex Johnson");
+  if(!name) return;
+  const email = prompt("Enter your email:", "alex.johnson@gmail.com");
+  if(!email || !isEmail(email)){ toast("Invalid email", "error"); return; }
+
+  const session = Auth.signInWithGoogle({
+    name, email,
+    picture: "https://ui-avatars.com/api/?name=" +
+             encodeURIComponent(name) + "&background=6366f1&color=fff&size=128"
+  });
+  toast("Signed in with Google (demo)", "success");
+  setTimeout(() => enterApp(session), 400);
+});
+
+window.handleGoogleCredential = function(response){
+  try{
+    const payload = JSON.parse(atob(response.credential.split(".")[1]));
+    const session = Auth.signInWithGoogle({
+      name: payload.name,
+      email: payload.email,
+      picture: payload.picture
+    });
+    toast("Welcome, " + payload.name.split(" ")[0] + "!", "success");
+    setTimeout(() => enterApp(session), 400);
+  }catch(e){
+    toast("Google sign-in failed", "error");
+  }
+};
+
+/* =========================================================
+   6. APP UI
+   ========================================================= */
+let currentUser = null;
+
+function enterApp(session){
+  currentUser = session;
+  authScreen.style.display = "none";
+  appEl.classList.add("active");
+
+  ["header-avatar","menu-avatar"].forEach(id => setAvatar($(id), session));
+  $("header-name").textContent = session.name;
+  $("header-email").textContent = session.email;
+  $("menu-name").textContent = session.name;
+  $("menu-email").textContent = session.email;
+
+  $("s-faqs").textContent = FAQS.length;
+  updateStats();
+
+  const box = $("messages");
+  box.innerHTML = "";
+  addMessage("bot",
+    '<p><strong>Hello, ' + escapeHtml(session.name.split(" ")[0]) + '! 👋</strong></p>' +
+    '<p>Ask me anything about our product, billing, security, or support.</p>');
+
+  $("q").focus();
+}
+
+function signOut(){
+  Auth.signout();
+  appEl.classList.remove("active");
+  authScreen.style.display = "flex";
+  currentUser = null;
+  toast("Signed out");
+}
+
+/* User menu */
+$("user-btn").addEventListener("click", e => {
+  e.stopPropagation();
+  $("user-menu").classList.toggle("open");
+});
+
+document.addEventListener("click", () => {
+  $("user-menu").classList.remove("open");
+});
+
+$("menu-signout").addEventListener("click", () => {
+  $("user-menu").classList.remove("open");
+  signOut();
+});
+
+$("menu-clear").addEventListener("click", () => {
+  $("user-menu").classList.remove("open");
+  if(!currentUser) return;
+  Auth.clearUserChat(currentUser.email);
+  $("messages").innerHTML = "";
+  addMessage("bot", "<p>Chat history cleared. How can I help you?</p>");
+  updateStats();
+  toast("Chat history cleared");
+});
+
+$("menu-profile").addEventListener("click", () => {
+  $("user-menu").classList.remove("open");
+  if(!currentUser) return;
+  const s = Auth.getUserStats(currentUser.email);
+  alert(
+    "Profile\n\n" +
+    "Name: " + currentUser.name + "\n" +
+    "Email: " + currentUser.email + "\n" +
+    "Provider: " + (currentUser.provider === "google" ? "Google" : "Email") + "\n" +
+    "Session started: " + new Date(currentUser.loginAt).toLocaleString() + "\n" +
+    "Queries this session: " + s.count
+  );
+});
+
+/* =========================================================
+   7. CHAT UI
+   ========================================================= */
+const box = $("messages");
+const form = $("chat-form");
+const input = $("q");
+const send = $("send");
+
+function escapeHtml(s){
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function scrollDown(){ box.scrollTop = box.scrollHeight; }
+
+function addMessage(role, html){
+  const div = document.createElement("div");
+  div.className = "msg " + role;
+  const av = role === "user"
+    ? '<div class="avatar">' + (currentUser ? avatarHTML(currentUser) : "U") + '</div>'
+    : '<div class="avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff">🤖</div>';
+  div.innerHTML = av + '<div class="bubble">' + html + '</div>';
+  box.appendChild(div);
+  scrollDown();
+}
+
+function showTyping(){
+  const div = document.createElement("div");
+  div.className = "msg bot";
+  div.id = "typing";
+  div.innerHTML = '<div class="avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff">🤖</div>' +
+    '<div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+  box.appendChild(div);
+  scrollDown();
+}
+
+function hideTyping(){
+  const t = $("typing");
+  if(t) t.remove();
+}
+
+function badgeHTML(score, matched){
+  let cls = "low", lbl = "🔴 No confident match";
+  if(matched && score >= 0.60){ cls = "high"; lbl = "🟢 High confidence"; }
+  else if(matched && score >= 0.35){ cls = "med"; lbl = "🟡 Medium confidence"; }
+  else if(matched){ cls = "low"; lbl = "🔴 Low confidence"; }
+  return '<div class="badge ' + cls + '">' + lbl + ' · ' + score.toFixed(2) + '</div>';
+}
+
+async function ask(question){
+  question = (question || "").trim();
+  if(!question) return;
+
+  addMessage("user", escapeHtml(question));
+  input.value = "";
+  send.disabled = true;
+  showTyping();
+
+  await new Promise(r => setTimeout(r, 300));
+
+  const r = bot.ask(question);
+  hideTyping();
+
+  const formatted = escapeHtml(r.answer).replace(/\n/g, "<br>");
+  let html = "<p>" + formatted + "</p>" + badgeHTML(r.confidence, r.matched);
+
+  if(r.alternatives && r.alternatives.length && !r.matched){
+    html += '<div class="alts"><div class="alts-t">Did you mean…</div>';
+    for(const a of r.alternatives){
+      html += '<div class="alt" data-q="' + escapeHtml(a.question) + '">💡 ' +
+              escapeHtml(a.question) +
+              ' <span style="opacity:0.6">(' + a.confidence.toFixed(2) + ')</span></div>';
+    }
+    html += "</div>";
+  }
+
+  addMessage("bot", html);
+
+  if(currentUser){
+    Auth.logQuery(currentUser.email, {
+      query: question,
+      faqId: r.faqId,
+      confidence: r.confidence,
+      matched: r.matched
+    });
+  }
+  updateStats();
+
+  send.disabled = false;
+  input.focus();
+}
+
+function updateStats(){
+  const s = bot.stats();
+  $("s-hits").textContent = s.cacheHits;
+  if(currentUser){
+    $("s-queries").textContent = Auth.getUserStats(currentUser.email).count;
+  }
+}
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  ask(input.value);
+});
+
+document.querySelectorAll(".chip").forEach(c => {
+  c.addEventListener("click", () => ask(c.dataset.q));
+});
+
+box.addEventListener("click", e => {
+  const a = e.target.closest(".alt");
+  if(a && a.dataset.q) ask(a.dataset.q);
+});
+
+/* =========================================================
+   8. BOOT
+   ========================================================= */
+(function boot(){
+  const session = Auth.getSession();
+  if(session) enterApp(session);
+  console.log("🤖 FAQ Chatbot Pro — ready");
+})();
+</script>
+</body>
+</html>
